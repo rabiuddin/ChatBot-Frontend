@@ -7,7 +7,7 @@ export default function ThemeToggle({ isDarkMode, setIsDarkMode }) {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={() => setIsDarkMode(!isDarkMode)}
-      className="p-2 rounded-full bg-gray-200 dark:bg-gray-700"
+      className="p-2 rounded-full bg-gray-300 dark:bg-gray-700 transition duration-500 ease-in-out hover:bg-gray-400 dark:hover:bg-gray-600"
     >
       {isDarkMode ? (
         <svg

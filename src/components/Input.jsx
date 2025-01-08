@@ -2,9 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from '../config/axios.config.js';
 
-export default function Input({ onSend, selectedAPI }) {
+export default function Input({ onSend, selectedModel, isLoading, setIsLoading }) {
     const [message, setMessage] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
     const textareaRef = useRef(null);
 
     const handleSubmit = async (e) => {
@@ -14,8 +13,8 @@ export default function Input({ onSend, selectedAPI }) {
             setIsLoading(true);
             setMessage('');
             try {
-                const endpoint = selectedAPI === 'openai' ? '/api/chat-completion/openai' : '/api/chat-completion/gemini';
-                const response = await axios.post(endpoint, { prompt: message });
+                const endpoint = "/api/chat-completion";
+                const response = await axios.post(endpoint, { prompt: message, model: selectedModel});
                 onSend(response.data.data, false); 
             } catch (error) {
                 console.error('Error sending message:', error);
@@ -42,14 +41,14 @@ export default function Input({ onSend, selectedAPI }) {
     }, [message]);
 
     return (
-        <form onSubmit={handleSubmit} className="flex items-end">
+        <form onSubmit={handleSubmit} className="flex items-end mb-3">
             <textarea
                 ref={textareaRef}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Type your message..."
-                className="flex-1 p-4 rounded-2xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white resize-none overflow-y-auto"
+                placeholder="Type your query..."
+                className="flex-1 p-4 rounded-3xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white resize-none overflow-y-auto transition duration-500 ease-in-out"
                 rows={1}
                 style={{ minHeight: '60px', maxHeight: '160px' }}
                 disabled={false} // Enable typing
