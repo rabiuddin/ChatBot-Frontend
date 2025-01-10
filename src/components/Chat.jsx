@@ -8,8 +8,14 @@ import Loader from './Loader';
 
 export default function Chat() {
     const [messages, setMessages] = useState([]);
-    const [isDarkMode, setIsDarkMode] = useState(false);
-    const [selectedModel, setSelectedModel] = useState('gpt-4'); // Default to Gemini
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        const saved = localStorage.getItem('isDarkMode');
+        return saved ? JSON.parse(saved) : false;
+    });
+    const [selectedModel, setSelectedModel] = useState(() => {
+        const saved = localStorage.getItem('selectedModel');
+        return saved || 'gpt-4';
+    });
     const [isLoading, setIsLoading] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [isUserLoading, setIsUserLoading] = useState(false);
@@ -24,6 +30,7 @@ export default function Chat() {
     }, [messages]);
 
     useEffect(() => {
+        localStorage.setItem('isDarkMode', JSON.stringify(isDarkMode));
         if (isDarkMode) {
             document.documentElement.classList.add('dark');
         } else {
@@ -31,6 +38,10 @@ export default function Chat() {
         }
         document.documentElement.style.transition = 'background-color 0.5s ease, color 0.5s ease';
     }, [isDarkMode]);
+
+    useEffect(() => {
+        localStorage.setItem('selectedModel', selectedModel);
+    }, [selectedModel]);
 
     return (
         <div className="h-screen flex flex-col">

@@ -20,7 +20,6 @@ export default function Input({
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (message.trim()) {
-            setIsUserLoading(true);
             onSend(message, true); 
             setIsLoading(true);
             setMessage('');
