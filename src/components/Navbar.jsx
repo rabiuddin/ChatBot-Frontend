@@ -11,10 +11,13 @@ export default function Navbar({ selectedModel, setSelectedModel }) {
 
     const handleOptionChange = (value) => {
         if (value === "gpt-4"){
-            setSelectedModel('gpt-4');
+            setSelectedModel(value);
         }
         else if (value === "gemini-1.5-flash"){
-            setSelectedModel('gemini-1.5-flash');
+            setSelectedModel(value);
+        }
+        else if( value == "mergestack-assistant"){
+            setSelectedModel(value);
         }
         setIsDropdownOpen(false); // Close dropdown after selection
     };
@@ -47,9 +50,9 @@ export default function Navbar({ selectedModel, setSelectedModel }) {
                     <div className="relative" ref={dropdownRef}>
                         <button
                             onClick={handleDropdownToggle}
-                            className="px-4 py-2 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white transition duration-300 ease-in-out transform hover:scale-[1.03] hover:bg-gray-400 dark:hover:bg-gray-600 "
+                            className="px-4 py-2 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white mr-14 transition duration-300 ease-in-out transform hover:scale-[1.03] hover:bg-gray-400 dark:hover:bg-gray-600 "
                         >
-                            {selectedModel === 'gpt-4' ? "GPT-4" : "Gemini 1.5 Flash"}
+                            {selectedModel === 'gpt-4' ? "GPT-4" : selectedModel === "gemini-1.5-flash"? "Gemini 1.5 Flash" : "MergeStack AI"}
                         </button>
                         <AnimatePresence>
                             {isDropdownOpen && (
@@ -71,6 +74,12 @@ export default function Navbar({ selectedModel, setSelectedModel }) {
                                         className="px-4 py-2 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 border-t border-gray-300 dark:border-gray-600 dark:text-white transition duration-300 ease-in-out" 
                                     >
                                         Gemini 1.5 Flash
+                                    </div>
+                                    <div
+                                        onClick={() => handleOptionChange('mergestack-assistant')}
+                                        className="px-4 py-2 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 border-t border-gray-300 dark:border-gray-600 dark:text-white transition duration-300 ease-in-out" 
+                                    >
+                                        MergeStack AI
                                     </div>
                                 </motion.div>
                             )}

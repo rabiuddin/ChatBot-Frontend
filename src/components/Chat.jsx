@@ -4,18 +4,20 @@ import Message from './Message';
 import Input from './Input';
 import ThemeToggle from './ThemeToggle';
 import Navbar from './Navbar';
+import Loader from './Loader';
 
 export default function Chat() {
     const [messages, setMessages] = useState([]);
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [selectedModel, setSelectedModel] = useState('gpt-4'); // Default to Gemini
     const [isLoading, setIsLoading] = useState(false);
+    const [isRecording, setIsRecording] = useState(false);
+    const [isUserLoading, setIsUserLoading] = useState(false);
     const messagesEndRef = useRef(null);
 
     const addMessage = (text, isUser) => {
         setMessages((prevMessages) => [...prevMessages, { text, isUser }]);
     };
-
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -32,58 +34,62 @@ export default function Chat() {
 
     return (
         <div className="h-screen flex flex-col">
-            <Navbar selectedModel={selectedModel} setSelectedModel={setSelectedModel} />
-            <div className="border-b border-gray-300 dark:border-gray-600 relative transition duration-500 ease-in-out"></div>
-            <div className="flex-1 bg-gray-200 dark:bg-gray-800 p-4 overflow-y-auto relative transition duration-500 ease-in-out ">
-                <div className="fixed top-3 right-4">
-                    <ThemeToggle isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
-                </div>
-                <div className="max-w-2xl mx-auto">
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        {messages.map((message, index) => (
-                            <Message key={index} text={message.text} isUser={message.isUser} />
-                        ))}
-                        {isLoading && (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.5 }}
-                                className="flex justify-start mb-4"
-                            >
-                                <div className="flex items-center justify-center w-8 h-8 bg-black dark:bg-white text-white dark:text-black rounded-full mr-2 transition duration-500 ease-in-out">
-                                    AI
+            <div className="fixed top-0 left-0 right-0 z-10">
+                <Navbar selectedModel={selectedModel} setSelectedModel={setSelectedModel} />
+                <div className="border-b border-gray-300 dark:border-gray-600 transition duration-500 ease-in-out"></div>
+            </div>
+
+            <div className="flex-1 bg-gray-200 dark:bg-gray-800 transition duration-500 ease-in-out overflow-hidden pt-16 pb-24">
+                <div className="h-full overflow-y-auto">
+                    <div className="max-w-2xl mx-auto p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            {messages.map((message, index) => (
+                                <Message key={index} text={message.text} isUser={message.isUser} />
+                            ))}
+                            {isUserLoading && (
+                                <div className="flex justify-end mb-4">
+                                    <div className='my-auto'>
+                                        <Loader />
+                                    </div>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                    <motion.div
-                                        className="w-2.5 h-2.5 bg-gray-400 dark:bg-gray-200 rounded-full"
-                                        animate={{ opacity: [0.3, 1, 0.3] }}
-                                        transition={{ repeat: Infinity, duration: 1 }}
-                                    ></motion.div>
-                                    <motion.div
-                                        className="w-2.5 h-2.5 bg-gray-400 dark:bg-gray-200 rounded-full"
-                                        animate={{ opacity: [0.3, 1, 0.3] }}
-                                        transition={{ repeat: Infinity, duration: 1, delay: 0.2 }}
-                                    ></motion.div>
-                                    <motion.div
-                                        className="w-2.5 h-2.5 bg-gray-400 dark:bg-gray-200 rounded-full"
-                                        animate={{ opacity: [0.3, 1, 0.3] }}
-                                        transition={{ repeat: Infinity, duration: 1, delay: 0.4 }}
-                                    ></motion.div>
+                            )}
+                            {isLoading && (
+                                <div className="flex justify-start mb-4">
+                                    <div className="flex items-center justify-center w-8 h-8 bg-black dark:bg-white text-white dark:text-black rounded-full mr-2 transition duration-500 ease-in-out">
+                                        AI
+                                    </div>
+                                    <div className='my-auto'>
+                                        <Loader/>
+                                    </div>
                                 </div>
-                            </motion.div>
-                        )}
-                    </motion.div>
-                    <div ref={messagesEndRef} />
+                            )}
+                        </motion.div>
+                        <div ref={messagesEndRef} />
+                    </div>
                 </div>
             </div>
-            <div className="bg-gray-200 dark:bg-gray-800 p-4 transition duration-500 ease-in-out ">
+
+            <div className="fixed bottom-0 left-0 right-0 bg-gray-200 dark:bg-gray-800 p-4 transition duration-500 ease-in-out">
                 <div className="max-w-2xl mx-auto">
-                    <Input onSend={addMessage} selectedModel={selectedModel} isLoading={isLoading} setIsLoading={setIsLoading}/>
+                    <Input 
+                        onSend={addMessage} 
+                        selectedModel={selectedModel} 
+                        isLoading={isLoading} 
+                        setIsLoading={setIsLoading}
+                        isUserLoading={isUserLoading}
+                        setIsUserLoading={setIsUserLoading}
+                        isRecording={isRecording}
+                        setIsRecording={setIsRecording}
+                    />
                 </div>
+            </div>
+
+            <div className="fixed top-3 right-4 z-20">
+                <ThemeToggle isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
             </div>
         </div>
     );

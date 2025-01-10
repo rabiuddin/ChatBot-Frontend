@@ -6,13 +6,13 @@ import remarkGfm from 'remark-gfm'; // For GitHub-flavored markdown (optional)
 export default function Message({ text, isUser }) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 0 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
             className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}
         >
             {!isUser && (
-                <div className="flex items-center justify-center w-8 h-8 bg-black dark:bg-white text-white dark:text-black rounded-full mr-2 transition duration-500 ease-in-out mt-1">
+                <div className="flex items-center justify-center min-w-8 h-8 bg-black dark:bg-white text-white dark:text-black rounded-full mr-2 transition duration-500 ease-in-out mt-1">
                     AI
                 </div>
             )}
