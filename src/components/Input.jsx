@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from '../config/axios.config.js';
 import microphoneImage from '../assets/microphone-342.svg';
-import { encryptData, decryptData } from '../config/encryption.config.js';
+import { handleResponse } from '../utils/handle_response.utils.js';
+import { sendRequest } from '../utils/handle_request.utils.js';
 
 export default function Input({ 
     onSend, 
@@ -46,15 +47,14 @@ export default function Input({
             setIsLoading(true);
             setMessage('');
             try {
-
-                const encryptedMessage = encryptData(message);
-
                 const endpoint = selectedModel === "mergestack-assistant" ? "/api/mergestack-assistant":"/api/chat-completion";
-                const response = await axios.post(endpoint, {prompt: encryptedMessage, model: selectedModel});
-                const decryptedResponse = decryptData(response.data.data);
-                
+                const handledResponse = await sendRequest(endpoint, { prompt: message, model: selectedModel });
+                if (!handledResponse.success) {
+                    onSend(handledResponse.error, false);
+                } else {
+                    onSend(handledResponse.data, false);
+                }
                 setIsUserLoading(false);
-                onSend(decryptedResponse, false); 
             } catch (error) {
                 console.error('Error sending message:', error);
                 setIsUserLoading(false);
@@ -106,20 +106,19 @@ export default function Input({
                             'Content-Type': 'multipart/form-data',
                         },
                     });
-                    const decryptedResponse = decryptData(response.data.data);
+                    const handledResponse = handleResponse(response.data);
                     setIsUserLoading(false);
-                    let message = decryptedResponse;
+                    let message = handledResponse.data;
                     onSend(message, true);
 
                     setIsLoading(true);
-
-                    const encryptedMessage = encryptData(message);
-
                     const endpoint = selectedModel === "mergestack-assistant" ? "/api/mergestack-assistant":"/api/chat-completion";
-
-                    const res = await axios.post(endpoint, {prompt: encryptedMessage, model: selectedModel});
-                    const decryptedRes = decryptData(res.data.data);
-                    onSend(decryptedRes, false); 
+                    const handledRes = await sendRequest(endpoint, { prompt: message, model: selectedModel });
+                    if (!handledRes.success) {
+                        onSend(handledRes.error, false);
+                    } else {
+                        onSend(handledRes.data, false);
+                    }
 
                 } catch (error) {
                     console.error('Error processing audio:', error);
