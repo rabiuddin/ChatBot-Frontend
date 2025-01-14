@@ -16,6 +16,27 @@ export default function Input({
     const [message, setMessage] = useState('');
     const [mediaRecorder, setMediaRecorder] = useState(null);
     const textareaRef = useRef(null);
+    const [audioLevel, setAudioLevel] = useState([0, 0, 0]);
+    const analyzerRef = useRef(null);
+    const animationFrameRef = useRef(null);
+
+    const updateAudioLevel = () => {
+        if (analyzerRef.current) {
+            const dataArray = new Uint8Array(analyzerRef.current.frequencyBinCount);
+            analyzerRef.current.getByteFrequencyData(dataArray);
+            
+            // Get three frequency ranges (low, mid, high)
+            const chunks = Math.floor(dataArray.length / 3);
+            const levels = [
+                dataArray.slice(0, chunks).reduce((a, b) => a + b, 0) / chunks,
+                dataArray.slice(chunks, chunks * 2).reduce((a, b) => a + b, 0) / chunks,
+                dataArray.slice(chunks * 2).reduce((a, b) => a + b, 0) / chunks
+            ].map(val => val / 255); // Normalize to 0-1
+            
+            setAudioLevel(levels);
+            animationFrameRef.current = requestAnimationFrame(updateAudioLevel);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -50,6 +71,13 @@ export default function Input({
     const handleMicClick = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioContext.createMediaStreamSource(stream);
+            const analyzer = audioContext.createAnalyser();
+            analyzer.fftSize = 256;
+            source.connect(analyzer);
+            analyzerRef.current = analyzer;
+            
             const recorder = new MediaRecorder(stream);
             setMediaRecorder(recorder);
             const chunks = [];
@@ -59,6 +87,9 @@ export default function Input({
             };
     
             recorder.onstop = async () => {
+                cancelAnimationFrame(animationFrameRef.current);
+                analyzerRef.current = null;
+                audioContext.close();
                 const audioBlob = new Blob(chunks, { type: 'audio/wav' });
                 const formData = new FormData();
                 formData.append('audio_file', audioBlob, 'recording.wav'); // Ensure the key matches the backend parameter
@@ -89,6 +120,7 @@ export default function Input({
     
             recorder.start();
             setIsRecording(true);
+            updateAudioLevel();
         } catch (error) {
             console.error('Error accessing microphone:', error);
         }
@@ -192,11 +224,34 @@ export default function Input({
             {isRecording && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex flex-col items-center justify-center pointer-events-auto">
                     <div className="text-white text-2xl mb-8">Listening...</div>
-                    <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ repeat: Infinity, duration: 1.5 }}
-                        className="w-16 h-16 bg-red-500 rounded-full mb-8"
-                    />
+                    <div className="h-32 flex items-center justify-center space-x-3 mb-8">
+                        {[0, 1, 2].map((index) => (
+                            <div key={index} className="h-full flex items-center">
+                                <motion.div
+                                    className="w-4 bg-red-500 rounded-full"
+                                    animate={{
+                                        height: Array.isArray(audioLevel) 
+                                            ? `${4 + (audioLevel[index] * 96)}px` // Transforms from 4px dot to max 100px line
+                                            : '4px',
+                                        borderRadius: Array.isArray(audioLevel)
+                                            ? audioLevel[index] > 0.1 ? '4px' : '50%' // Changes from circle to rounded rectangle
+                                            : '50%',
+                                        backgroundColor: [
+                                            "rgb(239, 68, 68)",
+                                            `rgb(${Math.max(239 - (Array.isArray(audioLevel) ? audioLevel[index] * 200 : 0), 100)}, 68, 68)`
+                                        ]
+                                    }}
+                                    transition={{
+                                        duration: 0.05,
+                                        ease: "linear"
+                                    }}
+                                    style={{
+                                        boxShadow: `0 0 10px rgba(239, 68, 68, ${Array.isArray(audioLevel) ? 0.3 + audioLevel[index] * 0.7 : 0.3})`
+                                    }}
+                                />
+                            </div>
+                        ))}
+                    </div>
                     <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
