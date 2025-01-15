@@ -49,6 +49,8 @@ export default function Input({
             try {
                 const endpoint = selectedModel === "mergestack-assistant" ? "/api/mergestack-assistant":"/api/chat-completion";
                 const handledResponse = await sendRequest(endpoint, { prompt: message, model: selectedModel });
+                console.log(`Response Success:`, handledResponse.success);
+                console.log(`Response error:`, handledResponse.error);
                 if (!handledResponse.success) {
                     onSend(handledResponse.error, false);
                 } else {

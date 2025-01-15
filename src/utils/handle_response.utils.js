@@ -4,8 +4,15 @@ export const handleResponse = (response) => {
     const { success, data, error, statusCode } = response;
     console.log(response);
 
+    console.log("Error in handleResponse: ", error);
+
     if (!success) {
-        throw new Error(error || 'Unknown error occurred');
+        return {
+            success,
+            data,
+            error,
+            statusCode
+        };
     }
 
     const decryptedData = decryptData(data);

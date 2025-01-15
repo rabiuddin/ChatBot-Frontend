@@ -1,5 +1,5 @@
 import axios from '../config/axios.config.js';
-import { encryptData, decryptData } from '../config/encryption.config.js';
+import { encryptData } from '../config/encryption.config.js';
 import { handleResponse } from './handle_response.utils.js';
 
 export const sendRequest = async (endpoint, data) => {
