@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from '../config/axios.config.js';
-import microphoneImage from '../assets/microphone-342.svg';
+import microphoneImage from '../assets/microphone.png';
+import arrowImage from '../assets/arrow.png';
 import { handleResponse } from '../utils/handle_response.utils.js';
 import { sendRequest } from '../utils/handle_request.utils.js';
 
@@ -175,43 +176,12 @@ export default function Input({
                     }`}
                     disabled={isLoading || isRecording || isUserLoading}
                 >
-                    {(isLoading || isUserLoading) ? (
-                        <svg
-                            className="animate-spin h-5 w-5 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                            ></circle>
-                            <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8v8H4z"
-                            ></path>
-                        </svg>
-                    ) : (
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M14 5l7 7m0 0l-7 7m7-7H3"
-                            />
-                        </svg>
-                    )}
+                    <img
+                        src={arrowImage}
+                        alt="Arrow"
+                        className="size-8 text-white"
+                        style={{ filter: 'invert(100%) sepia(0%) saturate(0%) hue-rotate(93deg) brightness(103%) contrast(103%)' }}
+                    />
                 </motion.button>
                 <motion.button
                     whileHover={{ scale: 1.05 }}
