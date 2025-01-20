@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Message from './Message';
 import Input from './Input';
-import ThemeToggle from './ThemeToggle';
 import Navbar from './Navbar';
 import Loader from './Loader';
 
