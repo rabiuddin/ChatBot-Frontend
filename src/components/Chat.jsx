@@ -46,11 +46,10 @@ export default function Chat() {
     return (
         <div className="h-screen flex flex-col">
             <div className="fixed top-0 left-0 right-0 z-10">
-                <Navbar selectedModel={selectedModel} setSelectedModel={setSelectedModel} />
-                <div className="border-b border-gray-300 dark:border-gray-600 transition duration-500 ease-in-out"></div>
+                <Navbar selectedModel={selectedModel} setSelectedModel={setSelectedModel} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
             </div>
 
-            <div className="flex-1 bg-gray-200 dark:bg-gray-800 transition duration-500 ease-in-out overflow-hidden pt-16 pb-24">
+            <div className="flex-1 bg-gray-200 dark:bg-gray-800 transition duration-500 ease-in-out overflow-hidden pt-16 pb-24 mt-10 sm:mt-0">
                 <div className="h-full overflow-y-auto">
                     <div className="max-w-2xl mx-auto p-4">
                         <motion.div
@@ -97,10 +96,6 @@ export default function Chat() {
                         setIsRecording={setIsRecording}
                     />
                 </div>
-            </div>
-
-            <div className="fixed top-3 right-4 z-20">
-                <ThemeToggle isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
             </div>
         </div>
     );
