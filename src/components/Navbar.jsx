@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// JSON data for model names and values
+const models = {
+    "GPT-4": "gpt-4",
+    "Gemini": "gemini-1.5-flash",
+    "MergeStack AI": "mergestack-assistant",
+    "Fine Tuned GPT": "ft:gpt-4o-mini-2024-07-18:mergestack:sarcasm-detector:ArfxWUAV",
+    "Fine Tuned Gemini": "tunedModels/sarcastic-ai-sn3f6oecag98"
+};
+
 export default function Navbar({ selectedModel, setSelectedModel }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -10,15 +19,7 @@ export default function Navbar({ selectedModel, setSelectedModel }) {
     };
 
     const handleOptionChange = (value) => {
-        if (value === "gpt-4"){
-            setSelectedModel(value);
-        }
-        else if (value === "gemini-1.5-flash"){
-            setSelectedModel(value);
-        }
-        else if( value == "mergestack-assistant"){
-            setSelectedModel(value);
-        }
+        setSelectedModel(value);
         setIsDropdownOpen(false); // Close dropdown after selection
     };
 
@@ -52,7 +53,7 @@ export default function Navbar({ selectedModel, setSelectedModel }) {
                             onClick={handleDropdownToggle}
                             className="px-4 py-2 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white mr-14 transition duration-300 ease-in-out transform hover:scale-[1.03] hover:bg-gray-400 dark:hover:bg-gray-600 "
                         >
-                            {selectedModel === 'gpt-4' ? "GPT-4" : selectedModel === "gemini-1.5-flash"? "Gemini 1.5 Flash" : "MergeStack AI"}
+                            {Object.keys(models).find(key => models[key] === selectedModel)}
                         </button>
                         <AnimatePresence>
                             {isDropdownOpen && (
@@ -63,24 +64,15 @@ export default function Navbar({ selectedModel, setSelectedModel }) {
                                     transition={{ duration: 0.3 }}
                                     className="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-700 z-50"
                                 >
-                                    <div
-                                        onClick={() => handleOptionChange('gpt-4')}
-                                        className="px-4 py-2 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 border-b border-gray-300 dark:border-gray-600 dark:text-white transition duration-300 ease-in-out"
-                                    >
-                                        GPT-4
-                                    </div>
-                                    <div
-                                        onClick={() => handleOptionChange('gemini-1.5-flash')}
-                                        className="px-4 py-2 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 border-t border-gray-300 dark:border-gray-600 dark:text-white transition duration-300 ease-in-out" 
-                                    >
-                                        Gemini 1.5 Flash
-                                    </div>
-                                    <div
-                                        onClick={() => handleOptionChange('mergestack-assistant')}
-                                        className="px-4 py-2 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 border-t border-gray-300 dark:border-gray-600 dark:text-white transition duration-300 ease-in-out" 
-                                    >
-                                        MergeStack AI
-                                    </div>
+                                    {Object.entries(models).map(([name, value]) => (
+                                        <div
+                                            key={value}
+                                            onClick={() => handleOptionChange(value)}
+                                            className="px-4 py-2 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 border-b border-gray-300 dark:border-gray-600 dark:text-white transition duration-300 ease-in-out"
+                                        >
+                                            {name}
+                                        </div>
+                                    ))}
                                 </motion.div>
                             )}
                         </AnimatePresence>
