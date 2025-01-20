@@ -17,7 +17,7 @@ export default function Message({ text, isUser }) {
                 </div>
             )}
             <div
-                className={`max-w-xl px-4 py-2 rounded-lg break-words whitespace-pre-wrap transition duration-500 ease-in-out ${
+                className={`max-w-sm sm:max-w-xl px-4 py-2 rounded-lg break-words whitespace-pre-wrap transition duration-500 ease-in-out ${
                     isUser
                         ? 'bg-blue-500 text-white'
                         : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-white'
