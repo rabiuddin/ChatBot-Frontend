@@ -14,7 +14,10 @@ export default function Input({
     isUserLoading,
     setIsUserLoading,
     isRecording, 
-    setIsRecording 
+    setIsRecording,
+    selectedChat,
+    setSelectedChat,
+    setChats
 }) {
     const [message, setMessage] = useState('');
     const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -41,6 +44,44 @@ export default function Input({
         }
     };
 
+    const saveMessages = async (HumanMessage, AIMessage) => {
+        let chatID = selectedChat.id;
+
+        const response = await axios.post("/api/messages", { ChatID: chatID, HumanMessage: HumanMessage, AIMessage: AIMessage });
+
+        if (!response.data.success) {
+            console.error('Error adding message to chat:', response.error);
+        } else {
+            console.log("Message added to chat");
+        }
+    }
+
+    const setChatTitle = async (HumanMessage) => {
+        if (selectedChat.title === null){
+            let chatID = selectedChat.id;
+            const response = await axios.get(`/api/chats/title-summary/${HumanMessage}`);
+            if (!response.data.success) {
+                console.error('Error getting title for chat:', response.error);
+            } else {
+                const title = response.data.data;
+                
+                setChats((prevChats) => {
+                    const newChats = [...prevChats];
+                    const chatIndex = newChats.findIndex((chat) => chat.id === chatID);
+                    newChats[chatIndex] = { ...newChats[chatIndex], title: title };
+                    return newChats;
+                });
+
+                // Save the title in the database
+                try {
+                    await axios.put(`/api/chats?chatID=${chatID}&title=${title}`);
+                } catch (error) {
+                    console.error('Error saving title to database:', error);
+                }
+            }
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (message.trim()) {
@@ -48,14 +89,14 @@ export default function Input({
             setIsLoading(true);
             setMessage('');
             try {
-                const endpoint = selectedModel === "mergestack-assistant" ? "/api/mergestack-assistant":"/api/chat-completion";
-                const handledResponse = await sendRequest(endpoint, { prompt: message, model: selectedModel });
-                console.log(`Response Success:`, handledResponse.success);
-                console.log(`Response error:`, handledResponse.error);
+                const endpoint = selectedModel === "mergestack-assistant" ? "/api/mergestack-assistant" : "/api/chat-completion";
+                const handledResponse = await sendRequest(endpoint, { prompt: message, model: selectedModel, chatID: selectedChat.id });
                 if (!handledResponse.success) {
                     onSend(handledResponse.error, false);
                 } else {
                     onSend(handledResponse.data, false);
+                    saveMessages(message, handledResponse.data);
+                    setChatTitle(message);
                 }
                 setIsUserLoading(false);
             } catch (error) {
@@ -116,7 +157,7 @@ export default function Input({
 
                     setIsLoading(true);
                     const endpoint = selectedModel === "mergestack-assistant" ? "/api/mergestack-assistant":"/api/chat-completion";
-                    const handledRes = await sendRequest(endpoint, { prompt: message, model: selectedModel });
+                    const handledRes = await sendRequest(endpoint, { prompt: message, model: selectedModel, chatID: selectedChat.id });
                     if (!handledRes.success) {
                         onSend(handledRes.error, false);
                     } else {

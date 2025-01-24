@@ -24,3 +24,27 @@ export const handleResponse = (response) => {
         statusCode
     };
 };
+
+export const handleMsgChatResponse = (response) => {
+    const { success, data, error, statusCode } = response;
+
+    console.log("Error in handleMsgChatResponse: ", error);
+
+    console.log("Response Data: ", data);
+
+    if (!success) {
+        return {
+            success,
+            data,
+            error,
+            statusCode
+        };
+    }
+
+    return {
+        success,
+        data: data,
+        error,
+        statusCode
+    };
+}

@@ -4,6 +4,9 @@ import Message from './Message';
 import Input from './Input';
 import Navbar from './Navbar';
 import Loader from './Loader';
+import Chats from './Chats';
+import { getChats } from '../utils/handle_request.utils';
+import { handleNewChat } from '../utils/chats.utils';
 
 export default function Chat() {
     const [messages, setMessages] = useState([]);
@@ -18,10 +21,21 @@ export default function Chat() {
     const [isLoading, setIsLoading] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [isUserLoading, setIsUserLoading] = useState(false);
+    const [isChatListVisible, setIsChatListVisible] = useState(false);
+    const [chats, setChats] = useState([]);
+    const [selectedChat, setSelectedChat] = useState(null);
     const messagesEndRef = useRef(null);
 
     const addMessage = (text, isUser) => {
         setMessages((prevMessages) => [...prevMessages, { text, isUser }]);
+    };
+
+    const toggleChatList = () => {
+        setIsChatListVisible(!isChatListVisible);
+    };
+
+    const addNewChat = async () => {
+        await handleNewChat(setChats, setSelectedChat);
     };
 
     useEffect(() => {
@@ -42,58 +56,125 @@ export default function Chat() {
         localStorage.setItem('selectedModel', selectedModel);
     }, [selectedModel]);
 
+    useEffect(() => {
+        const fetchChats = async () => {
+            const response = await getChats('/api/chats');
+            if (response.success) {
+                setChats(response.data);
+            } else {
+                console.error('Error getting chats:', response.error);
+            }
+        };
+
+        fetchChats();
+    }, []);
+
     return (
-        <div className="h-screen flex flex-col">
-            <div className="fixed top-0 left-0 right-0 z-10">
-                <Navbar selectedModel={selectedModel} setSelectedModel={setSelectedModel} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+        <div className="h-screen flex">
+            <div
+                className={`h-full z-20 fixed top-0 left-0 md:static transition-all duration-500 ${isChatListVisible ? 'w-full md:w-80' : 'w-0'}`}
+            >
+                <Chats toggleChatList={toggleChatList} chats={chats} setChats={setChats} selectedChat={selectedChat} setSelectedChat={setSelectedChat} setMessages={setMessages} messages={messages} />
             </div>
 
-            <div className="flex-1 bg-gray-200 dark:bg-gray-800 transition duration-500 ease-in-out overflow-hidden pt-16 pb-24 mt-10 sm:mt-0">
-                <div className="h-full overflow-y-auto">
-                    <div className="max-w-2xl mx-auto p-4">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.5 }}
-                        >
-                            {messages.map((message, index) => (
-                                <Message key={index} text={message.text} isUser={message.isUser} />
-                            ))}
-                            {isUserLoading && (
-                                <div className="flex justify-end mb-4">
-                                    <div className='my-auto'>
-                                        <Loader />
+            <div
+                className={`flex flex-col w-full`}
+            >
+                <div className="sticky top-0 z-10">
+                    <Navbar 
+                        selectedModel={selectedModel} 
+                        setSelectedModel={setSelectedModel} 
+                        isDarkMode={isDarkMode} 
+                        setIsDarkMode={setIsDarkMode} 
+                        toggleChatList={toggleChatList} 
+                        isChatListVisible={isChatListVisible}
+                    />
+                </div>
+
+                {/* Main Chat Area */}
+                <div className='flex flex-col flex-1 overflow-y-auto'>
+                    <div className={`flex-1 bg-gray-200 dark:bg-gray-800 transition duration-500 ease-in-out pb-0 sm:mt-0 flex flex-col`}>
+                        <div className="flex-1 ">
+                            {
+                                messages.length === 0 && (
+                                    <div className="flex justify-center items-center h-full transition duration-500 ease-in-out">
+                                        <div className="text-center">
+                                            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Welcome to ChatBot</h1>
+                                            <p className="text-gray-500 dark:text-gray-300">Select a chat to start conversation</p>
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-                            {isLoading && (
-                                <div className="flex justify-start mb-4">
-                                    <div className="flex items-center justify-center w-8 h-8 bg-black dark:bg-white text-white dark:text-black rounded-full mr-2 transition duration-500 ease-in-out">
-                                        AI
+                                )
+                            }
+                            {
+                                selectedChat === null && (
+                                    <div className="flex justify-center">
+                                        <button 
+                                            onClick={addNewChat} 
+                                            className="px-4 py-2 rounded-lg dark:bg-gray-700 dark:hover:bg-gray-500 hover:scale-[1.03] hover:bg-gray-300 shadow-lg bg-white text-black dark:text-white transition duration-300 ease-in-out mb-10 "
+                                        >
+                                            New Chat
+                                        </button>
                                     </div>
-                                    <div className='my-auto'>
-                                        <Loader/>
-                                    </div>
-                                </div>
-                            )}
-                        </motion.div>
-                        <div ref={messagesEndRef} />
+                                )
+                            }
+                            <div className="max-w-2xl mx-auto p-4">
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                >
+                                    {messages.map((message, index) => (
+                                        <Message key={index} text={message.text} isUser={message.isUser} />
+                                    ))}
+                                    {isUserLoading && (
+                                        <div className="flex justify-end mb-4">
+                                            <div className='my-auto'>
+                                                <Loader />
+                                            </div>
+                                        </div>
+                                    )}
+                                    {isLoading && (
+                                        <div className="flex justify-start mb-4">
+                                            <div className="flex items-center justify-center w-8 h-8 bg-black dark:bg-white text-white dark:text-black rounded-full mr-2 transition duration-500 ease-in-out">
+                                                AI
+                                            </div>
+                                            <div className='my-auto'>
+                                                <Loader/>
+                                            </div>
+                                        </div>
+                                    )}
+                                </motion.div>
+                                <div ref={messagesEndRef} />
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div className="fixed bottom-0 left-0 right-0 bg-gray-200 dark:bg-gray-800 p-4 transition duration-500 ease-in-out">
-                <div className="max-w-2xl mx-auto">
-                    <Input 
-                        onSend={addMessage} 
-                        selectedModel={selectedModel} 
-                        isLoading={isLoading} 
-                        setIsLoading={setIsLoading}
-                        isUserLoading={isUserLoading}
-                        setIsUserLoading={setIsUserLoading}
-                        isRecording={isRecording}
-                        setIsRecording={setIsRecording}
-                    />
+                <div className="bg-gray-200 dark:bg-gray-800 p-4 transition duration-500 ease-in-out">
+                    <div className="max-w-2xl mx-auto">
+                        {selectedChat && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.5 }}
+                                className=' '
+                            >
+                                <Input 
+                                    onSend={addMessage} 
+                                    selectedModel={selectedModel} 
+                                    isLoading={isLoading} 
+                                    setIsLoading={setIsLoading}
+                                    isUserLoading={isUserLoading}
+                                    setIsUserLoading={setIsUserLoading}
+                                    isRecording={isRecording}
+                                    setIsRecording={setIsRecording}
+                                    selectedChat={selectedChat}
+                                    setSelectedChat={setSelectedChat}
+                                    setChats={setChats}
+                                />
+                            </motion.div>
+                            )
+                        }
+                    </div>
                 </div>
             </div>
         </div>

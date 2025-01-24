@@ -4,7 +4,5 @@ import './index.css'
 import Chat from './components/Chat.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
     <Chat />
-  </StrictMode>,
 )

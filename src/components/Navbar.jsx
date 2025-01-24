@@ -11,7 +11,7 @@ const models = {
     "Fine Tuned Gemini": "tunedModels/sarcastic-ai-sn3f6oecag98"
 };
 
-export default function Navbar({ selectedModel, setSelectedModel, isDarkMode, setIsDarkMode }) {
+export default function Navbar({ selectedModel, setSelectedModel, isDarkMode, setIsDarkMode, toggleChatList, isChatListVisible }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -47,6 +47,15 @@ export default function Navbar({ selectedModel, setSelectedModel, isDarkMode, se
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16 flex-col sm:flex-row">
                     <div className="flex items-center">
+                        <button onClick={toggleChatList} className="mr-8 sm:block">
+                            <svg className="w-6 h-6 text-gray-800 dark:text-white transition duration-500 ease-in-out" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                {isChatListVisible ? (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                                ) : (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                                )}
+                            </svg>
+                        </button>
                         <span className="font-extrabold text-3xl text-gray-800 dark:text-white my-3 transition duration-500 ease-in-out">ChatBot</span>
                     </div>
                     <div className='flex flex-row items-center'>
