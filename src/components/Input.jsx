@@ -16,7 +16,7 @@ export default function Input({
     isRecording, 
     setIsRecording,
     selectedChat,
-    setSelectedChat,
+    messages,
     setChats
 }) {
     const [message, setMessage] = useState('');
@@ -57,7 +57,7 @@ export default function Input({
     }
 
     const setChatTitle = async (HumanMessage) => {
-        if (selectedChat.title === null){
+        if (selectedChat.title === null && messages.length === 0){
             let chatID = selectedChat.id;
             const response = await axios.get(`/api/chats/title-summary/${HumanMessage}`);
             if (!response.data.success) {

@@ -97,27 +97,27 @@ export default function Chat() {
                         <div className="flex-1 ">
                             {
                                 messages.length === 0 && (
-                                    <div className="flex justify-center items-center h-full transition duration-500 ease-in-out">
+                                    <div className="flex justify-center items-center h-full">
                                         <div className="text-center">
-                                            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Welcome to ChatBot</h1>
-                                            <p className="text-gray-500 dark:text-gray-300">Select a chat to start conversation</p>
+                                            <h1 className="text-2xl font-bold text-gray-800 dark:text-white transition duration-500 ease-in-out">Welcome to ChatBot</h1>
+                                            <p className="text-gray-500 dark:text-gray-300 transition duration-500 ease-in-out">Select a chat or add a new chat to start conversation</p>
                                         </div>
                                     </div>
                                 )
                             }
                             {
                                 selectedChat === null && (
-                                    <div className="flex justify-center">
+                                    <div className="flex justify-center bg-gray-200 dark:bg-gray-800 transition duration-500 ease-in-out">
                                         <button 
                                             onClick={addNewChat} 
-                                            className="px-4 py-2 rounded-lg dark:bg-gray-700 dark:hover:bg-gray-500 hover:scale-[1.03] hover:bg-gray-300 shadow-lg bg-white text-black dark:text-white transition duration-300 ease-in-out mb-10 "
+                                            className="px-4 py-2 rounded-lg dark:bg-gray-700 dark:hover:bg-gray-500 hover:scale-[1.03] hover:bg-gray-300 shadow-lg bg-white text-black dark:text-white transition duration-500 ease-in-out mb-10 "
                                         >
                                             New Chat
                                         </button>
                                     </div>
                                 )
                             }
-                            <div className="max-w-2xl mx-auto p-4">
+                            <div className={`max-w-2xl ${messages.length ? 'mx-auto p-4': 'mx-0 p-0'} bg-gray-200 dark:bg-gray-800 transition duration-500 ease-in-out`}>
                                 <motion.div
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
@@ -168,7 +168,7 @@ export default function Chat() {
                                     isRecording={isRecording}
                                     setIsRecording={setIsRecording}
                                     selectedChat={selectedChat}
-                                    setSelectedChat={setSelectedChat}
+                                    messages={messages}
                                     setChats={setChats}
                                 />
                             </motion.div>
