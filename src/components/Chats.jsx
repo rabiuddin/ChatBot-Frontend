@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { addChat, getChats, getMessages } from '../utils/handle_request.utils';
 import { handleNewChat } from '../utils/chats.utils';
 
-export default function Chats({ toggleChatList, chats, setChats, selectedChat, setSelectedChat, setMessages, messages }) {
+export default function Chats({ toggleChatList, chats, setChats, selectedChat, setSelectedChat, setMessages, messages, setIsFetchingMessages }) {
 
     const addMessage = (text, isUser) => {
         setMessages((prevMessages) => [...prevMessages, { text, isUser }]);
@@ -11,6 +11,7 @@ export default function Chats({ toggleChatList, chats, setChats, selectedChat, s
     useEffect(() => {
         const fetchMessages = async () => {
             setMessages([]);
+            setIsFetchingMessages(true);
             if (selectedChat !== null) {
                 try {
                     const response = await getMessages(`/api/messages/${selectedChat.id}`);
@@ -24,7 +25,11 @@ export default function Chats({ toggleChatList, chats, setChats, selectedChat, s
                     }
                 } catch (error) {
                     console.error('Error fetching messages:', error);
+                } finally {
+                    setIsFetchingMessages(false);
                 }
+            } else {
+                setIsFetchingMessages(false);
             }
         };
 

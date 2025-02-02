@@ -4,11 +4,8 @@ import ThemeToggle from './ThemeToggle';
 
 // JSON data for model names and values
 const models = {
-    "GPT-4": "gpt-4",
     "Gemini": "gemini-1.5-flash",
-    "MergeStack AI": "mergestack-assistant",
-    "Fine Tuned GPT": "ft:gpt-4o-mini-2024-07-18:mergestack:sarcasm-detector:ArmuGrrw",
-    "Fine Tuned Gemini": "tunedModels/sarcastic-ai-sn3f6oecag98"
+    "Sarcastic Gemini": "tunedModels/sarcastic-ai-sn3f6oecag98"
 };
 
 export default function Navbar({ selectedModel, setSelectedModel, isDarkMode, setIsDarkMode, toggleChatList, isChatListVisible }) {

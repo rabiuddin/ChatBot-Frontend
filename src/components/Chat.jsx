@@ -16,7 +16,7 @@ export default function Chat() {
     });
     const [selectedModel, setSelectedModel] = useState(() => {
         const saved = localStorage.getItem('selectedModel');
-        return saved || 'gpt-4';
+        return saved || 'gemini-1.5-flash';
     });
     const [isLoading, setIsLoading] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
@@ -24,6 +24,7 @@ export default function Chat() {
     const [isChatListVisible, setIsChatListVisible] = useState(false);
     const [chats, setChats] = useState([]);
     const [selectedChat, setSelectedChat] = useState(null);
+    const [isFetchingMessages, setIsFetchingMessages] = useState(false);
     const messagesEndRef = useRef(null);
 
     const addMessage = (text, isUser) => {
@@ -74,7 +75,7 @@ export default function Chat() {
             <div
                 className={`h-full z-20 fixed top-0 left-0 md:static transition-all duration-500 ${isChatListVisible ? 'w-full md:w-80' : 'w-0'}`}
             >
-                <Chats toggleChatList={toggleChatList} chats={chats} setChats={setChats} selectedChat={selectedChat} setSelectedChat={setSelectedChat} setMessages={setMessages} messages={messages} />
+                <Chats toggleChatList={toggleChatList} chats={chats} setChats={setChats} selectedChat={selectedChat} setSelectedChat={setSelectedChat} setMessages={setMessages} messages={messages} setIsFetchingMessages={setIsFetchingMessages} />
             </div>
 
             <div
@@ -96,7 +97,7 @@ export default function Chat() {
                     <div className={`flex-1 bg-gray-200 dark:bg-gray-800 transition duration-500 ease-in-out pb-0 sm:mt-0 flex flex-col`}>
                         <div className="flex-1 ">
                             {
-                                messages.length === 0 && (
+                                messages.length === 0 && !isFetchingMessages && (
                                     <div className="flex justify-center items-center h-full">
                                         <div className="text-center">
                                             <h1 className="text-2xl font-bold text-gray-800 dark:text-white transition duration-500 ease-in-out">Welcome to ChatBot</h1>
@@ -117,15 +118,21 @@ export default function Chat() {
                                     </div>
                                 )
                             }
-                            <div className={`max-w-2xl ${messages.length ? 'mx-auto p-4': 'mx-0 p-0'} bg-gray-200 dark:bg-gray-800 transition duration-500 ease-in-out`}>
+                            <div className={`max-w-2xl ${messages.length === 0? 'max-w-full': 'mx-auto p-4'} bg-gray-200 dark:bg-gray-800 transition duration-500 ease-in-out`}>
                                 <motion.div
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.5 }}
                                 >
-                                    {messages.map((message, index) => (
-                                        <Message key={index} text={message.text} isUser={message.isUser} />
-                                    ))}
+                                    {isFetchingMessages ? (
+                                        <div className="flex items-center justify-center h-screen">
+                                            <div className="w-12 h-12 border-4 border-gray-400 dark:border-gray-300 dark:border-t-blue-500 border-t-gray-950 rounded-full animate-spin transition duration-500 ease-in-out"></div>
+                                      </div>
+                                    ) : (
+                                        messages.map((message, index) => (
+                                            <Message key={index} text={message.text} isUser={message.isUser} />
+                                        ))
+                                    )}
                                     {isUserLoading && (
                                         <div className="flex justify-end mb-4">
                                             <div className='my-auto'>
