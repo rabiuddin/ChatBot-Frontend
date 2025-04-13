@@ -48,6 +48,21 @@ export const getMessages = async (endpoint, chatID) => {
     }
 }
 
+export const deleteChat = async (endpoint) => {
+    try {
+        const response = await axios.delete(endpoint);
+        return handleMsgChatResponse(response.data);
+    } catch (error) {
+        console.error('Error deleting chat:', error);
+        return {
+            success: false,
+            data: null,
+            error: "Sorry our AI facilities are currently down, please try again later. Error deleting chat.",
+            statusCode: 500
+        };
+    }
+}
+
 export const addChat = async (endpoint) => {
     try {
         const response = await axios.post(endpoint);
