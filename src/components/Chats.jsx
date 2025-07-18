@@ -19,7 +19,7 @@ export default function Chats({
 }) {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [chatToDelete, setChatToDelete] = useState(null);
-  const [createtingNewChat, setCreatingNewChat] = useState(false);
+  const [isCreatingChat, setIsCreatingChat] = useState(false);
 
   const addMessage = (text, isUser) => {
     setMessages((prevMessages) => [...prevMessages, { text, isUser }]);
@@ -59,6 +59,15 @@ export default function Chats({
     setSelectedChat(chat);
     if (window.innerWidth < 768) {
       toggleChatList();
+    }
+  };
+
+  const handleNewChatClick = async () => {
+    setIsCreatingChat(true);
+    try {
+      await handleNewChat(setChats, setSelectedChat);
+    } finally {
+      setIsCreatingChat(false);
     }
   };
 
@@ -105,11 +114,13 @@ export default function Chats({
           </h2>
           <div className="flex items-center space-x-2">
             <button
-              disabled={creatingNewChat}
-              onClick={() => handleNewChat(setChats, setSelectedChat, setCreatingNewChat)}
-              className="px-3 py-1 rounded-lg dark:bg-gray-800 dark:hover:bg-gray-500 hover:scale-[1.03] hover:bg-gray-300 shadow-md bg-white text-black dark:text-white transition duration-300 ease-in-out"
+              onClick={handleNewChatClick}
+              disabled={isCreatingChat}
+              className={`px-3 py-1 rounded-lg dark:bg-gray-800 dark:hover:bg-gray-500 hover:scale-[1.03] hover:bg-gray-300 shadow-md bg-white text-black dark:text-white transition duration-300 ease-in-out ${
+                isCreatingChat ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
-              New Chat
+              {isCreatingChat ? 'Creating...' : 'New Chat'}
             </button>
             <button
               onClick={toggleChatList}
